@@ -37,26 +37,24 @@ for p in range(len(price)):
 #---------------------------------------
 
 # This will move through the page so the webpage makes the proper requests to the server
-elementToMove = driver.find_elements(By.CLASS_NAME, 'sc-1tt2vbg-3')
+elementToMove = driver.find_elements(By.CLASS_NAME, 'sc-i1odl-3')
 action = ActionChains(driver)
 
 counter = 0
 
 while counter < len(elementToMove):
-    # try: 
-    print(counter)
     action.move_to_element(elementToMove[counter]).perform()
-    if len(driver.window_handles) < len(elementToMove) + 1:
+    if len(driver.window_handles) < 2:
         action.click(on_element = elementToMove[counter]).perform()
-    driver.switch_to.window(driver.window_handles[0])
-    if (counter + 1) == len(elementToMove) and len(driver.window_handles) != (counter + 2):
-        action.click(on_element = elementToMove[counter]).perform()
-        print('hola')
-        counter -= 1
+        if len(driver.window_handles) == 2:
+            driver.switch_to.window(driver.window_handles[1])
+            lasLlavesData['url'].append(driver.current_url)
+            driver.close()
+            driver.switch_to.window(driver.window_handles[0])
+        else:    
+            counter -= 1
     counter += 1
         
-# except IndexError as e:
-#         print(e)
 # Timer for letting the webpage load
 time.sleep(20)
 
@@ -79,11 +77,6 @@ for i in range(len(imagesRaw)):
 
 lasLlavesData['images'] = images
 
-for windowTo in range(len(driver.window_handles)): 
-     driver.switch_to.window(driver.window_handles[windowTo])
-     if windowTo != 0: 
-        lasLlavesData['url'].append(driver.current_url)  
-
 # Exporting to Excel 
 
 print(len(lasLlavesData['url']), len(lasLlavesData['images']), len(lasLlavesData['address']), len(lasLlavesData['meters']), len(lasLlavesData['prices']))
@@ -91,4 +84,4 @@ print(len(lasLlavesData['url']), len(lasLlavesData['images']), len(lasLlavesData
 df = pd.DataFrame(lasLlavesData)   
 customHeader = ['Precios', 'Metros_cuadrados', 'Dirección', 'URL_de_las_imágenes', "URLs"]
 
-df.to_excel('lasLlaves.csv', na_rep='N/A', index=False, header = customHeader)
+df.to_csv('lasLlaves.csv', na_rep='N/A', index=False, header = customHeader)
