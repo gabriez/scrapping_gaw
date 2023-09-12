@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
 
-data = {
+lasLlavesData = {
     'prices': [], 
     'meters': [], 
     'address': [],
@@ -24,13 +24,13 @@ meters = driver.find_elements(By.XPATH, '//img[@class="sc-1uhtbxc-1 eLhfrW"]/fol
 location = driver.find_elements(By.CLASS_NAME, 'sc-ge2uzh-1')
 
 for l in range(len(location)):
-    data['address'].append(location[l].text)
+    lasLlavesData['address'].append(location[l].text)
 
 for m in range(len(meters)):
-    data['meters'].append(meters[m].text)
+    lasLlavesData['meters'].append(meters[m].text)
 
 for p in range(len(price)):
-    data['prices'].append(price[p].text)
+    lasLlavesData['prices'].append(price[p].text)
 
 #---------------------------------------
 # The next resolution is for the images
@@ -39,13 +39,26 @@ for p in range(len(price)):
 # This will move through the page so the webpage makes the proper requests to the server
 elementToMove = driver.find_elements(By.CLASS_NAME, 'sc-1tt2vbg-3')
 action = ActionChains(driver)
-for element in elementToMove:
-    action.move_to_element(element).perform()
-    action.click(on_element = element).perform()
-    driver.switch_to.window(driver.window_handles[0])
 
+counter = 0
+
+while counter < len(elementToMove):
+    # try: 
+    print(counter)
+    action.move_to_element(elementToMove[counter]).perform()
+    if len(driver.window_handles) < len(elementToMove) + 1:
+        action.click(on_element = elementToMove[counter]).perform()
+    driver.switch_to.window(driver.window_handles[0])
+    if (counter + 1) == len(elementToMove) and len(driver.window_handles) != (counter + 2):
+        action.click(on_element = elementToMove[counter]).perform()
+        print('hola')
+        counter -= 1
+    counter += 1
+        
+# except IndexError as e:
+#         print(e)
 # Timer for letting the webpage load
-time.sleep(25)
+time.sleep(20)
 
 
 # Maybe this unnecesary, but is an explicit wait by Selenium for recording all the img elements
@@ -64,24 +77,18 @@ for i in range(len(imagesRaw)):
         insideImage = []
 
 
-data['images'] = images
+lasLlavesData['images'] = images
 
-# for image in range(len(images)):
-#     data['images'].append(images[image])
-
-print(len(driver.window_handles))
 for windowTo in range(len(driver.window_handles)): 
-     print(windowTo)
      driver.switch_to.window(driver.window_handles[windowTo])
      if windowTo != 0: 
-        print(driver.current_url, windowTo)
-        data['url'].append(driver.current_url)  
+        lasLlavesData['url'].append(driver.current_url)  
 
 # Exporting to Excel 
 
-print(len(data['url']), len(data['images']), len(data['address']), len(data['meters']), len(data['prices']))
+print(len(lasLlavesData['url']), len(lasLlavesData['images']), len(lasLlavesData['address']), len(lasLlavesData['meters']), len(lasLlavesData['prices']))
 
-df = pd.DataFrame(data)   
-customHeader = ['Precios', 'Metros cuadrados', 'Dirección', 'URL de las imágenes', "URL's"]
+df = pd.DataFrame(lasLlavesData)   
+customHeader = ['Precios', 'Metros_cuadrados', 'Dirección', 'URL_de_las_imágenes', "URLs"]
 
-df.to_excel('lasLlaves.xlsx', na_rep='N/A', index=False, header = customHeader)
+df.to_excel('lasLlaves.csv', na_rep='N/A', index=False, header = customHeader)
