@@ -23,14 +23,10 @@ price = driver.find_elements(By.CLASS_NAME,'sc-12dh9kl-4')
 meters = driver.find_elements(By.XPATH, '//img[@class="sc-1uhtbxc-1 eLhfrW"]/following::span[1]')
 location = driver.find_elements(By.CLASS_NAME, 'sc-ge2uzh-1')
 
-for l in range(len(location)):
-    lasLlavesData['address'].append(location[l].text)
-
-for m in range(len(meters)):
-    lasLlavesData['meters'].append(meters[m].text)
-
-for p in range(len(price)):
-    lasLlavesData['prices'].append(price[p].text)
+for i in range(len(location)):
+    lasLlavesData['address'].append(location[i].text)
+    lasLlavesData['meters'].append(meters[i].text)
+    lasLlavesData['prices'].append(price[i].text) 
 
 #---------------------------------------
 # The next resolution is for the images
