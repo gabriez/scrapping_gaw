@@ -56,31 +56,24 @@ while counter < len(elementToMove):
     counter += 1
         
 # Timer for letting the webpage load
-time.sleep(20)
-
+time.sleep(5)
 
 # Maybe this unnecesary, but is an explicit wait by Selenium for recording all the img elements
-imagesRaw = WebDriverWait(driver, 15).until(
-    EC.presence_of_all_elements_located((By.XPATH, '//div[@class="flickity-slider"]/child::img'))
-    )
+imagesContainers = WebDriverWait(driver, 15).until(
+     EC.presence_of_all_elements_located((By.CLASS_NAME, 'flickity-slider'))
+     )
 
 images = []
-insideImage = []
-for i in range(len(imagesRaw)):
-    if (i + 1) % 8 != 0: 
-        insideImage.append(imagesRaw[i].get_attribute('src') if imagesRaw[i].get_attribute('src') != None else imagesRaw[i].get_attribute('data-flickity-lazyload'))
-    else:
-        insideImage.append(imagesRaw[i].get_attribute('src') if imagesRaw[i].get_attribute('src') != None else imagesRaw[i].get_attribute('data-flickity-lazyload'))
-        images.append(insideImage)
-        insideImage = []
+for imagesGroup in imagesContainers:
+    imagesRaw = imagesGroup.find_elements(By.TAG_NAME, 'img')
+    for i in range(len(imagesRaw)):
+        imagesRaw[i] = imagesRaw[i].get_attribute('src') if imagesRaw[i].get_attribute('src') != None else imagesRaw[i].get_attribute('data-flickity-lazyload')
+    images.append(imagesRaw)
 
 
 lasLlavesData['images'] = images
 
-# Exporting to Excel 
-
-print(len(lasLlavesData['url']), len(lasLlavesData['images']), len(lasLlavesData['address']), len(lasLlavesData['meters']), len(lasLlavesData['prices']))
-
+# Exporting to CSV 
 df = pd.DataFrame(lasLlavesData)   
 customHeader = ['Precios', 'Metros_cuadrados', 'Dirección', 'URL_de_las_imágenes', "URLs"]
 
