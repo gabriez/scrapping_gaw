@@ -14,10 +14,12 @@ lasLlavesData = {
     'images': [],
     'url': []
 }
-baseUrl = "https://www.conlallave.com/inmuebles-en-venta-en-area-metropolitana-caracas.html"
+BASEURL = "https://www.conlallave.com/inmuebles-en-venta-en-area-metropolitana-caracas.html"
 
 driver = webdriver.Chrome()
-driver.get(baseUrl)
+driver.get(BASEURL)
+action = ActionChains(driver)
+
 
 price = driver.find_elements(By.CLASS_NAME,'sc-12dh9kl-4')
 meters = driver.find_elements(By.XPATH, '//img[@class="sc-1uhtbxc-1 eLhfrW"]/following::span[1]')
@@ -34,7 +36,7 @@ for i in range(len(location)):
 
 # This will move through the page so the webpage makes the proper requests to the server
 elementToMove = driver.find_elements(By.CLASS_NAME, 'sc-i1odl-3')
-action = ActionChains(driver)
+
 
 counter = 0
 
