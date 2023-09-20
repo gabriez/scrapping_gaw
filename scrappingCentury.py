@@ -5,12 +5,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
-import threading
-
-
-#------------------------------------------------------THREAD-----------------------------------
-
-#-----------------------------------------------------------------------------------------------
 
 
 BASEURL = 'https://www.century21global.com/en/l/a/venezuela,miranda,caracas?page=1&max=48'
@@ -41,16 +35,9 @@ size = []
 url = []
 location = []
 
-# '//*[@class="col-lg-6 col-xl-4 ng-star-inserted"]'
-#'//*[@class="col-lg-6 col-xl-4 ng-star-inserted"]/site-property-thumbnail/a/div/div/div[2]/div[4]/div[3]/span'
 
 
 for container in containersPages: 
-    # time.sleep(2)
-    # action.click(on_element = container).perform()
-    # time.sleep(2)
-    # driver.back()
-
     baseUrl = container.get_attribute('href')
     print(baseUrl)
     driver.get(baseUrl)
@@ -89,5 +76,3 @@ data = {
 df = pd.DataFrame(data)
 customHeader = ['Precios', 'Metros_cuadrados', 'Dirección', 'URL_de_las_imágenes', "URLs"]
 df.to_csv('Century.csv', na_rep='N/A', index=False, header = customHeader)
-
-#//*[@class="row g-4 py-3 layout-grid"]
