@@ -10,34 +10,6 @@ import threading
 
 #------------------------------------------------------THREAD-----------------------------------
 
-def threadInfo(baseUrl): 
-    optionsThread = webdriver.ChromeOptions()
-    optionsThread.add_argument("--headless")
-    print(baseUrl)
-    driver = webdriver.Chrome(options = optionsThread)
-    driver.get(baseUrl)
-
-    
-    explicitWaitThread = WebDriverWait(driver, 10)
-    try:
-        sizeRaw = driver.find_element(By.XPATH, '//*[@class="main-content"]/site-property/div[1]/div[2]/div/div[2]/div[2]/dl/dd/span[1]') 
-    except:
-        sizeRaw = driver.find_element(By.XPATH, '//site-property/div[1]/div[2]/div/div[2]/div[1]/dl/dd') 
-    priceRaw = explicitWaitThread.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="mat-display-2 fw-bold mb-2 d-flex ng-star-inserted"]')))
-    locationRaw = explicitWaitThread.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="mat-h4 mb-0 ng-star-inserted"]')))
-    size.append(sizeRaw.text)
-    prices.append(priceRaw.text)
-    url.append(driver.current_url)
-    location.append(locationRaw.text)
-
-    # Getting images
-    time.sleep(2)
-    imagesRaw =  explicitWaitThread.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@class="gallery tile-5 normal"]/descendant::img')))
-    for i in range(len(imagesRaw)):
-        imagesRaw[i] = imagesRaw[i].get_attribute('src')
-    images.append(imagesRaw)
-
-
 #-----------------------------------------------------------------------------------------------
 
 
@@ -45,7 +17,7 @@ BASEURL = 'https://www.century21global.com/en/l/a/venezuela,miranda,caracas?page
 
 
 options = webdriver.ChromeOptions()
-options.add_argument("--headless")
+#options.add_argument("--headless")
 
 
 driver = webdriver.Chrome(options = options)
@@ -79,35 +51,31 @@ for container in containersPages:
     # time.sleep(2)
     # driver.back()
 
-    td = threading.Thread(target=threadInfo, args=(container.get_attribute('href'),))
-    td.start()
-
-    td.join()
-    # action.move_to_element(container).perform()
-    # action.context_click(container).perform()
-    # press('enter', presses=2)
-    # driver.switch_to.window(driver.window_handles[1])
+    baseUrl = container.get_attribute('href')
+    print(baseUrl)
+    driver.get(baseUrl)
+    time.sleep(1)
     
-    # Getting size, url, location and price 
-           
-    # sizeRaw = explicitWait.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="main-content"]/site-property/div[1]/div[2]/div/div[2]/div[2]/dl/dd/span[1]')))
-    # priceRaw = explicitWait.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="mat-display-2 fw-bold mb-2 d-flex ng-star-inserted"]')))
-    # locationRaw = explicitWait.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="mat-h4 mb-0 ng-star-inserted"]')))
-    # size.append(sizeRaw.text)
-    # prices.append(priceRaw.text)
-    # url.append(driver.current_url)
-    # location.append(locationRaw.text)
+    explicitWaitThread = WebDriverWait(driver, 10)
+    try:
+        sizeRaw = driver.find_element(By.XPATH, '//*[@class="main-content"]/site-property/div[1]/div[2]/div/div[2]/div[2]/dl/dd/span[1]') 
+    except:
+        sizeRaw = driver.find_element(By.XPATH, '//site-property/div[1]/div[2]/div/div[2]/div[1]/dl/dd') 
+    priceRaw = explicitWaitThread.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="mat-display-2 fw-bold mb-2 d-flex ng-star-inserted"]')))
+    locationRaw = explicitWaitThread.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="mat-h4 mb-0 ng-star-inserted"]')))
+    size.append(sizeRaw.text)
+    prices.append(priceRaw.text)
+    url.append(driver.current_url)
+    location.append(locationRaw.text)
 
+    # Getting images
+    time.sleep(2)
+    imagesRaw =  explicitWaitThread.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@class="gallery-wrapper ng-star-inserted"]/descendant::img')))
+    for i in range(len(imagesRaw)):
+        imagesRaw[i] = imagesRaw[i].get_attribute('src')
+    images.append(imagesRaw)
+    driver.back()
 
-    # # Getting images
-    # time.sleep(3)
-    # imagesRaw =  explicitWait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@class="gallery tile-5 normal"]/descendant::img')))
-    # for i in range(len(imagesRaw)):
-    #     imagesRaw[i] = imagesRaw[i].get_attribute('src')
-    # images.append(imagesRaw)
-    # print(len(imagesRaw), len(prices), len(url), len(location), len(size))
-    # driver.close()
-    # driver.switch_to.window(driver.window_handles[0])
 
 
 data = {
