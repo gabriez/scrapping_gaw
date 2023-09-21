@@ -6,12 +6,17 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
 
+# Variables that will store all the information scraped
+images = []
+prices = []
+size = []
+url = []
+location = []
 
 BASEURL = 'https://www.century21global.com/en/l/a/venezuela,miranda,caracas?page=1&max=48'
-
-
 options = webdriver.ChromeOptions()
-#options.add_argument("--headless")
+options.add_argument("--start-maximized")
+options.add_argument("--headless=new")
 
 
 driver = webdriver.Chrome(options = options)
@@ -19,49 +24,49 @@ driver.get(BASEURL)
 
 action = ActionChains(driver)
 explicitWait = WebDriverWait(driver, 10)
-time.sleep(3)
-
-containersPages = explicitWait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@class="col-lg-6 col-xl-4 ng-star-inserted"]/site-property-thumbnail/a')))
-
-global images
-global prices
-global size
-global url
-global location
-
-images = []
-prices = []
-size = []
-url = []
-location = []
 
 
+# Getting info to manipulate URL
+maxPerPage = driver.find_element(By.XPATH, '//*[@class="d-none d-lg-flex justify-content-start align-items-center"]/div[1]/button[last()]') # This sets the pagination in the website, so I can get the info of all the pages that will be scraped
+action.click(on_element = maxPerPage).perform()
+pages = int(driver.find_element(By.XPATH, '//*[@class="d-flex justify-content-start align-items-center ng-star-inserted"]/button[last()-1]').text) # This returns the element that contains the information about the quantity of pages
 
-for container in containersPages: 
-    baseUrl = container.get_attribute('href')
-    print(baseUrl)
-    driver.get(baseUrl)
-    time.sleep(1)
-    
-    explicitWaitThread = WebDriverWait(driver, 10)
-    try:
-        sizeRaw = driver.find_element(By.XPATH, '//*[@class="main-content"]/site-property/div[1]/div[2]/div/div[2]/div[2]/dl/dd/span[1]') 
-    except:
-        sizeRaw = driver.find_element(By.XPATH, '//site-property/div[1]/div[2]/div/div[2]/div[1]/dl/dd') 
-    priceRaw = explicitWaitThread.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="mat-display-2 fw-bold mb-2 d-flex ng-star-inserted"]')))
-    locationRaw = explicitWaitThread.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="mat-h4 mb-0 ng-star-inserted"]')))
-    size.append(sizeRaw.text)
-    prices.append(priceRaw.text)
-    url.append(driver.current_url)
-    location.append(locationRaw.text)
+i = 1
 
-    # Getting images
-    time.sleep(2)
-    imagesRaw =  explicitWaitThread.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@class="gallery-wrapper ng-star-inserted"]/descendant::img')))
-    for i in range(len(imagesRaw)):
-        imagesRaw[i] = imagesRaw[i].get_attribute('src')
-    images.append(imagesRaw)
-    driver.back()
+while i <= pages: 
+    j = 1
+    if i > 1:
+        dynamicUrl = f'https://www.century21global.com/en/l/a/venezuela,miranda,caracas?page={i}&max=48'
+        driver.get(dynamicUrl)
+        time.sleep(1)    
+    containersPages = explicitWait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@class="col-lg-6 col-xl-4 ng-star-inserted"]/site-property-thumbnail/a')))    
+    print(len(containersPages))
+    for container in containersPages: 
+        baseUrl = container.get_attribute('href')
+        print(baseUrl, j)
+        driver.get(baseUrl)
+        time.sleep(1)
+        
+        try:
+            sizeRaw = explicitWait.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="main-content"]/site-property/div[1]/div[2]/div/div[2]/div[2]/dl/dd/span[1]'))) 
+        except:
+            sizeRaw = explicitWait.until(EC.visibility_of_element_located((By.XPATH, '//site-property/div[1]/div[2]/div/div[2]/div[1]/dl/dd'))) 
+        priceRaw = explicitWait.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="mat-display-2 fw-bold mb-2 d-flex ng-star-inserted"]')))
+        locationRaw = explicitWait.until(EC.visibility_of_element_located((By.XPATH, '//*[@class="mat-h4 mb-0 ng-star-inserted"]')))
+        size.append(sizeRaw.text)
+        prices.append(priceRaw.text)
+        url.append(driver.current_url)
+        location.append(locationRaw.text)
+
+        # Getting images
+        time.sleep(1)
+        imagesRaw =  explicitWait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@class="gallery-wrapper ng-star-inserted"]/descendant::img')))
+        for i in range(len(imagesRaw)):
+            imagesRaw[i] = imagesRaw[i].get_attribute('src')
+        images.append(imagesRaw)
+        driver.back()
+        j += 1
+    i += 1
 
 
 
